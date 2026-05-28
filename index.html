@@ -1,951 +1,709 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Digital Purchase Review</title>
+<title>Cash App Wallet</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
 
 *{
-  box-sizing:border-box;
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Inter',sans-serif;
 }
 
 body{
-  margin:0;
-  animation:
-backgroundMove 10s ease-in-out infinite;
-
-  font-family:"Inter",sans-serif;
-
-  background:#000000;
-
-  color:#1c1c1e;
-
-  overflow-x:hidden;
-background-image:
-radial-gradient(
-circle at top right,
-rgba(0,213,75,.08),
-transparent 30%
-);
+    background:#00d64f;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+    overflow:hidden;
 }
 
-@keyframes backgroundMove{
+padding:
+env(safe-area-inset-top)
+env(safe-area-inset-right)
+env(safe-area-inset-bottom)
+env(safe-area-inset-left);
 
-  0%{
-    background-position:
-    top right;
-  }
 
-  50%{
-    background-position:
-    center top;
-  }
+/* APP */
 
-  100%{
-    background-position:
-    top right;
-  }
-
+.app{
+    width:390px;
+    height:100dvh;
+	max-height:844px;
+    background:#f7f7f7;
+    border-radius:38px;
+	overflow-y:auto;
+	overflow-x:hidden;
+    position:relative;
+    box-shadow:
+    0 20px 60px rgba(0,0,0,.18);
 }
 
-/* LOADING */
-.start{
-  position:fixed;
-  inset:0;
+/* =========================
+   SPLASH SCREEN
+========================= */
 
-  background:#000000;
+.splash{
+    position:absolute;
+    inset:0;
+    background:#00d64f;
+    z-index:9999;
 
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
 
-  z-index:9999;
+    transition:.5s ease;
 }
 
-.logo{
-  width:140px;
-  height:140px;
+.splash-logo{
+    width:110px;
+    height:110px;
+    border-radius:28px;
+    background:#fff;
 
-  border-radius:20px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
 
-  overflow:hidden;
+    overflow:hidden;
 
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  margin-bottom:28px;
-
-
-  box-shadow:
-  0 10px 30px rgba(0,0,0,.12);
+    box-shadow:
+    0 10px 40px rgba(0,0,0,.12);
 }
 
-.logo img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-
-  display:block;
+.splash-logo img{
+    width:72%;
+    height:72%;
+    object-fit:contain;
 }
 
-.spinner{
-  width:52px;
-  height:52px;
+.loader{
+    width:42px;
+    height:42px;
+    border-radius:50%;
 
-  border-radius:50%;
+    border:3px solid rgba(255,255,255,.35);
+    border-top:3px solid #fff;
 
-  border:4px solid rgba(255,255,255,.12);
-  border-top:4px solid #ffffff;
+    margin-top:34px;
 
-  animation:spin 1s linear infinite;
+    animation:spin 1s linear infinite;
 }
 
 @keyframes spin{
-  100%{
-    transform:rotate(360deg);
-  }
+    100%{
+        transform:rotate(360deg);
+    }
 }
 
-#status{
-  margin-top:22px;
+.loading-text{
+    margin-top:22px;
+    color:#fff;
+    font-size:15px;
+    font-weight:600;
+    letter-spacing:.2px;
+}
 
-  color:rgba(255,255,255,.72);
+/* =========================
+   PIN SCREEN
+========================= */
 
-  font-size:15px;
+.pin-screen{
+    position:absolute;
+    inset:0;
+    background:#00d64f;
 
-  font-weight:500;
+    z-index:9998;
 
-  letter-spacing:.2px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
 
-  text-shadow:
-  0 2px 12px rgba(0,0,0,.35);
+    opacity:0;
+    pointer-events:none;
+
+    transition:.5s ease;
+}
+
+.pin-title{
+    color:#fff;
+    font-size:26px;
+    font-weight:800;
+    margin-bottom:38px;
+}
+
+.pin-dots{
+    display:flex;
+    gap:18px;
+}
+
+.dot{
+    width:20px;
+    height:20px;
+    border-radius:50%;
+    background:rgba(255,255,255,.25);
+
+    transition:.25s ease;
+}
+
+.dot.active{
+    background:#fff;
+    transform:scale(1.08);
+}
+
+/* =========================
+   MAIN PAGE
+========================= */
+
+.main{
+    position:absolute;
+    inset:0;
+
+    background:#f7f7f7;
+
+    transform:translateY(40px);
+    opacity:0;
+
+    transition:.7s cubic-bezier(.2,.8,.2,1);
+}
+
+/* STATUS */
+
+.status{
+    height:54px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:0 24px;
+
+    color:#000;
+    font-size:14px;
+    font-weight:700;
+}
+
+/* TOPBAR */
+
+.topbar{
+    padding:8px 22px 0;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+/* LOGO */
+
+.logo{
+    width:50px;
+    height:50px;
+    border-radius:16px;
+    background:#00d64f;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    overflow:hidden;
+}
+
+.logo img{
+    width:72%;
+    height:72%;
+    object-fit:contain;
+}
+
+/* PROFILE */
+
+.profile{
+    width:44px;
+    height:44px;
+    border-radius:50%;
+
+    background:#fff;
+
+    border:1px solid #ececec;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    font-size:18px;
 }
 
 /* HEADER */
+
 .header{
-  position:sticky;
-  top:0;
-  z-index:999;
-
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-
-  padding:14px 26px;
-
-  background:#0a0a0a;
-
-  backdrop-filter:none;
-
-  border-bottom:1px solid rgba(255,255,255,.05);
+    padding:14px 24px 10px;
 }
 
-.brand{
-  display:flex;
-  align-items:center;
-  gap:14px;
+/* CHART */
+
+.mini-chart{
+    margin-top:6px;
+    background:#fff;
+    border-radius:30px;
+    padding:22px;
+    border:1px solid #ececec;
 }
 
-.brand-icon{
-  width:50px;
-  height:50px;
-
-  border-radius:10px;
-
-  overflow:hidden;
-
-  flex-shrink:0;
-
-
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
+.chart-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    margin-bottom:14px;
 }
 
-.brand-icon img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-
-  display:block;
+.chart-balance{
+    font-size:clamp(28px,6vw,34px);
+    font-weight:800;
+    letter-spacing:-1px;
+    color:#000;
 }
 
-.brand-name{
-  font-size:18px;
-  color:white;
-  font-weight:700;
-  letter-spacing:.3px;
+.chart-growth{
+    margin-top:6px;
+    color:#00c94a;
+    font-size:14px;
+    font-weight:700;
 }
 
-.header-right{
-  color:#f2f3f5;
-  font-size:14px;
+.chart-pill{
+    background:#e8fff0;
+    color:#00c94a;
+    padding:8px 14px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:800;
 }
 
-.modal{
-  position:fixed;
-  inset:0;
-
-  display:flex;
-  justify-content:center;
-  align-items:flex-start;
-
-  padding-top:38px;
-
-  background:rgba(15,15,15,.10);
-
-  z-index:9999;
+.chart-svg{
+    width:100%;
+    height:120px;
+    display:block;
 }
 
-.modal-box{
-  width:100%;
-  max-width:500px;
+/* CTA */
 
-  background:#0f0f0f;
-
-  border:1px solid rgba(255,255,255,.06);
-
-  border-radius:32px;
-
-  padding:18px;
-
-  position:relative;
-
-  overflow:hidden;
-
-  opacity:0;
-
-  transform:
-  translateY(24px)
-  scale(.96);
-
-  animation:
-  modalIn .58s cubic-bezier(.2,.8,.2,1) forwards;
-
-  box-shadow:
-0 0 40px rgba(0,213,75,.12);
+.cta{
+    margin:0 24px 24px;
+    background:#00d64f;
+    border-radius:30px;
+    padding:18px;
+    color:#fff;
+    position:relative;
+    overflow:hidden;
 }
 
-@keyframes modalIn{
+.cta::after{
+    content:"";
+    position:absolute;
+    right:-40px;
+    top:-40px;
 
-  0%{
+    width:160px;
+    height:160px;
+
+    border-radius:50%;
+
+    background:rgba(255,255,255,.12);
+}
+
+.cta-title{
+    font-size:20px;
+    font-weight:700;
+    position:relative;
+    z-index:2;
+}
+
+.cta-sub{
+    margin-top:8px;
+    font-size:14px;
+    line-height:1.5;
+    width:75%;
+
+    color:rgba(255,255,255,.92);
+
+    position:relative;
+    z-index:2;
+}
+
+.cta-btn{
+    margin-top:18px;
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+
+    background:#fff;
+    color:#000;
+
+    padding:14px 20px;
+
+    border-radius:999px;
+
+    text-decoration:none;
+
+    font-size:15px;
+    font-weight:700;
+
+    position:relative;
+    z-index:2;
+}
+
+/* SECTION */
+
+.section{
+    padding:0 24px;
+}
+
+.section-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:18px;
+}
+
+.section-title{
+    font-size:21px;
+    font-weight:800;
+    color:#000;
+}
+
+.see-all{
+    font-size:14px;
+    font-weight:700;
+    color:#00c94a;
+}
+
+/* ACTIVITY */
+
+.activity-card{
+    background:#fff;
+    border-radius:28px;
+    padding:8px 18px;
+    border:1px solid #ededed;
+}
+
+/* ITEM */
+
+.item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    padding:18px 0;
+
+    border-bottom:1px solid #f1f1f1;
+}
+
+.item:last-child{
+    border:none;
+}
+
+.item-left{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+/* ICON */
+
+.icon{
+    width:54px;
+    height:54px;
+    border-radius:18px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    font-size:20px;
+    font-weight:700;
+}
+
+.green{
+    background:#e8fff0;
+    color:#00c94a;
+}
+
+.black{
+    background:#101010;
+    color:#fff;
+}
+
+.soft{
+    background:#f2f2f2;
+    color:#111;
+}
+
+/* TEXT */
+
+.name{
+    font-size:16px;
+    font-weight:700;
+    color:#000;
+}
+
+.time{
+    margin-top:5px;
+    font-size:13px;
+    color:#8a8a8a;
+}
+
+.amount{
+    font-size:18px;
+    font-weight:800;
+}
+
+.plus{
+    color:#00c94a;
+}
+
+.minus{
+    color:#000;
+}
+
+/* NAV */
+
+.nav{
+    position:absolute;
+    bottom:0;
+    left:0;
+
+    width:100%;
+
+    background:#fff;
+
+    border-top:1px solid #ececec;
+
+    display:flex;
+    justify-content:space-around;
+
+    padding:16px 0 28px;
+}
+
+.nav-item{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:7px;
+
+    font-size:12px;
+    font-weight:600;
+
+    color:#9a9a9a;
+}
+
+.nav-item.active{
+    color:#00c94a;
+}
+
+.nav-icon{
+    font-size:22px;
+}
+
+/* SHOW MAIN */
+
+.main.show{
+    transform:translateY(0);
+    opacity:1;
+}
+
+/* MOBILE */
+
+@media(max-width:430px){
+
+    body{
+        background:#f7f7f7;
+    }
+
+    .app{
+        width:100%;
+        height:100vh;
+        border-radius:0;
+    }
+
+}
+
+
+/* =========================
+   POPUP
+========================= */
+
+.popup-wrap{
+    position:absolute;
+
+    top:126px;
+    left:24px;
+    right:24px;
+	
+
+    z-index:999;
+
     opacity:0;
+    pointer-events:none;
 
     transform:
-    translateY(80px)
+    translateY(-24px)
     scale(.92);
-  }
+	width:auto;
 
-  60%{
+    transition:.5s cubic-bezier(.2,.8,.2,1);
+}
+
+.popup-wrap.show{
     opacity:1;
-
-    transform:
-    translateY(-6px)
-    scale(1.01);
-  }
-
-  100%{
-    opacity:1;
+    pointer-events:auto;
 
     transform:
     translateY(0)
     scale(1);
-  }
-
 }
 
-.glow{
-  position:absolute;
+.popup-card{
 
-  width:300px;
-  height:300px;
+    background:
+    rgba(255,255,255,.94);
 
-  border-radius:50%;
+    backdrop-filter:blur(18px);
 
-  background:
-  radial-gradient(
-    rgba(255,159,10,.10),
-    transparent
-  );
+    border-radius:32px;
 
-  top:-160px;
-  right:-120px;
+    padding:22px;
 
-  pointer-events:none;
+    border:
+    1px solid rgba(255,255,255,.7);
+
+    box-shadow:
+    0 30px 80px rgba(0,0,0,.16),
+    0 10px 30px rgba(0,0,0,.08);
+
+    position:relative;
+
+    overflow:hidden;
 }
 
-/* CARD IMAGE */
-.card-preview{
+max-width:100%;
 
-  height:230px;
-  
-  animation:
-  cardPulse 3s ease-in-out infinite;
+.popup-card::after{
 
-  border-radius:28px;
+    content:"";
 
-  background:
-  linear-gradient(
-    145deg,
-    #0b0b0b,
-    #161616
-  );
+    position:absolute;
 
-  border:1px solid rgba(255,255,255,.06);
-
-  margin-bottom:26px;
-
-  position:relative;
-
-  overflow:hidden;
-
-  box-shadow:
-  0 0 45px rgba(0,213,75,.14);
-
-}
-
-.card-preview::before{
-
-  content:"";
-
-  position:absolute;
-
-  width:260px;
-  height:260px;
-
-  border-radius:50%;
-
-  background:
-  radial-gradient(
-    rgba(0,213,75,.16),
-    transparent
-  );
-
-  top:-100px;
-  right:-80px;
-
-}
-
-.card-preview::after{
-
-  content:"₿ Cash App Transfer";
-
-  position:absolute;
-
-  top:24px;
-  left:24px;
-
-  color:#00d54b;
-
-  font-size:20px;
-
-  font-weight:700;
-
-  letter-spacing:.3px;
-
-}
-
-.card-title{
-  position:absolute;
-
-  top:22px;
-  left:22px;
-
-  color:white;
-
-  font-size:18px;
-  font-weight:600;
-
-  z-index:2;
-
-  text-shadow:0 2px 10px rgba(0,0,0,.25);
-}
-
-.card-amount{
-
-  position:absolute;
-
-  right:24px;
-
-  bottom:28px;
-
-  font-size:36px;
-
-  font-weight:800;
-
-  color:#ffffff;
-
-  z-index:2;
-
-  letter-spacing:-2px;
-
-  text-align:right;
-
-  text-shadow:
-  0 0 22px rgba(0,213,75,.18);
-
-}
-
-.transfer-user{
-
-  position:absolute;
-
-  left:24px;
-
-  bottom:98px;
-
-  color:#d1d5db;
-
-  font-size:15px;
-
-  font-weight:500;
-
-  letter-spacing:.2px;
-
-}
-
-.btc-network{
-
-  position:absolute;
-
-  left:24px;
-
-  bottom:74px;
-
-  color:#00d54b;
-
-  font-size:13px;
-
-  font-weight:600;
-
-  letter-spacing:.3px;
-
-}
-
-
-/* CONTENT */
-.heading{
-  text-align:center;
-
-  font-size:26px;
-
-  font-weight:650;
-
-  letter-spacing:-1.8px;
-
-  margin-bottom:10px;
-
-  color:#ffffff;
-}
-
-.sub{
-  text-align:center;
-
-  color:#bdbdbd;
-
-  line-height:1.6;
-
-  font-size:16px;
-
-  margin-bottom:24px;
-}
-
-.badge-wrap{
-  display:flex;
-  justify-content:center;
-
-  margin-bottom:24px;
-}
-
-.badge{
-  display:flex;
-  align-items:center;
-  gap:10px;
-
-  background:#1a1a1a;
-
-  border:1px solid rgba(255,255,255,.06);
-
-  padding:10px 18px;
-
-  border-radius:999px;
-
-  color:#ffffff;
-
-  font-size:14px;
-  font-weight:700;
-}
-
-.dot{
-  width:10px;
-  height:10px;
-
-  border-radius:50%;
-
-  background:#00d54b;
-
-  box-shadow:
-  0 0 10px #00d54b,
-  0 0 24px rgba(0,213,75,.55);
-
-  animation:statusPulse 1.2s infinite;
-}
-@keyframes statusPulse{
-
-  0%{
-    transform:scale(1);
-    opacity:1;
-  }
-
-  50%{
-    transform:scale(1.18);
-    opacity:.75;
-  }
-
-  100%{
-    transform:scale(1);
-    opacity:1;
-  }
-
-}
-
-/* INFO */
-.info{
-  background:#161616;
-
-  border:1px solid rgba(0,0,0,.05);
-
-  border-radius:24px;
-
-  padding:22px;
-
-  line-height:2;
-
-  color:#ffffff;
-
-  margin-bottom:24px;
-}
-
-.info b{
-  color:#00d54b;
-}
-
-/* BUTTONS */
-.btn{
-  width:100%;
-
-  padding:16px;
-
-  border:none;
-
-  border-radius:18px;
-
-  font-size:16px;
-  font-weight:700;
-
-  cursor:pointer;
-
-  transition:.25s ease;
-}
-
-.primary{
-  background:#00d54b;
-
-  color:#000;
-
-  border:1px solid rgba(255,255,255,.06);
-
-  box-shadow:
-  0 0 25px rgba(0,213,75,.35);
-
-  transition:.22s ease;
-}
-
-.primary:hover{
-
-  transform:
-  translateY(-3px)
-  scale(1.01);
-
-  filter:brightness(1.08);
-
-  box-shadow:
-  0 0 35px rgba(0,213,75,.45);
-
-}
-
-.secondary{
-  margin-top:10px;
-  background:#1a1a1a;
-  color:#ffffff;
-  border:1px solid rgba(255,255,255,.06);
-}
-
-/* PAGE 2 */
-.page2{
-  max-width:1100px;
-
-  margin:40px auto;
-
-  padding:0 20px;
-}
-
-.box{
-  background:rgba(18,18,18,.82);
-
-  border:none;
-
-  border-radius:30px;
-
-  padding:28px;
-
-  margin-bottom:24px;
-
-  box-shadow:
-  0 0 40px rgba(0,0,0,.35);
-}
-
-.top{
-  display:flex;
-  justify-content:space-between;
-  gap:20px;
-  flex-wrap:wrap;
-}
-
-.amount{
-  font-size:54px;
-  color:#ffffff;
-  font-weight:800;
-}
-
-.small{
-  color:#8e8e93;
-  font-size:13px;
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:18px;
-}
-
-.grid-box{
-  background:#161616;
-  color:white;
-
-  border:1px solid rgba(255,255,255,.05);
-
-  border-radius:20px;
-
-  padding:18px;
-}
-
-.grid-title{
-  color:#d1d5db;
-  font-size:13px;
-  margin-bottom:8px;
-}
-
-.grid-value{
-  font-size:18px;
-  font-weight:700;
-}
-
-.activity{
-
-  display:flex;
-
-  justify-content:space-between;
-
-  align-items:center;
-
-  padding:18px 4px;
-
-  background:transparent;
-
-  border:none;
-
-  border-bottom:
-  1px solid rgba(255,255,255,.05);
-
-  color:white;
-
-  margin-bottom:4px;
-
-}
-
-.activity-name{
-  font-weight:700;
-}
-
-.activity-sub{
-  color:#8e8e93;
-  font-size:13px;
-  margin-top:4px;
-}
-
-/* SUPPORT */
-.support-btn{
-
-  padding:16px 28px;
-
-  border:none;
-
-  border-radius:24px;
-
-  background:#00d54b;
-
-  color:#000;
-
-  font-size:15px;
-
-  font-weight:700;
-
-  cursor:pointer;
-
-  transition:.22s ease;
-
-  box-shadow:
-  0 0 25px rgba(0,213,75,.35);
-
-}
-
-.support-btn:hover{
-  transform:translateY(-2px);
-  filter:brightness(1.08);
-}
-
-/* FOOTER */
-.footer{
-  padding:18px 10px 60px;
-
-  text-align:center;
-}
-
-.footer-links{
-  color:#8e8e93;
-
-  font-size:13px;
-
-  display:flex;
-  justify-content:center;
-  gap:12px;
-
-  flex-wrap:wrap;
-
-  margin-bottom:14px;
-}
-
-.footer-copy{
-  color:#636366;
-
-  font-size:12px;
-}
-
-.hidden{
-  display:none;
-}
-
-@media(max-width:768px){
-
-  .modal-box{
-    padding:26px;
-  }
-
-  .heading{
-    font-size:28px;
-  }
-
-  .amount{
-    font-size:42px;
-  }
-
-}
-
-
-/* ===== FINAL MOBILE RESPONSIVE FIX ===== */
-
-@media(max-width:768px){
-
-  html,body{
-    width:100%;
-    overflow-x:hidden !important;
-  }
-
-  .header{
-    flex-direction:column;
-    align-items:flex-start;
-    gap:10px;
-    padding:14px;
-  }
-
-  .header-right{
-    width:100%;
-    text-align:left;
-    font-size:12px;
-    line-height:1.5;
-    word-break:break-word;
-  }
-
-  .brand{
-    width:100%;
-  }
-
-  .brand-name{
-    font-size:16px;
-  }
-
-  .modal{
-    padding:12px;
-    overflow-y:auto;
-  }
-
-  .modal-box{
-    width:100%;
-    max-width:100%;
-    padding:18px;
-    border-radius:22px;
-  }
-
-  .card-preview{
+    width:180px;
     height:180px;
-  }
 
-  .card-amount{
-    font-size:34px;
-  }
+    border-radius:50%;
 
-  .heading{
-    font-size:28px;
-    line-height:1.2;
-  }
+    background:
+    radial-gradient(
+        rgba(0,214,79,.12),
+        transparent
+    );
 
-  .sub{
-    font-size:14px;
-  }
+    top:-80px;
+    right:-60px;
 
-  .info{
-    padding:18px;
-    font-size:14px;
-    line-height:1.7;
-    word-break:break-word;
-  }
+    pointer-events:none;
+}
 
-  .btn{
-    font-size:15px;
-    padding:15px;
-  }
+.popup-badge{
+    display:inline-flex;
 
-  .page2{
-    padding:0 12px;
-  }
+    background:#e8fff0;
 
-  .box{
-    padding:18px;
-    border-radius:22px;
-  }
+    color:#00c94a;
 
-  .top{
-    flex-direction:column;
-  }
+    padding:8px 14px;
 
-  .amount{
-    font-size:36px;
-	color:#ffffff;
-  }
+    border-radius:999px;
 
-  .grid{
-    grid-template-columns:1fr;
-  }
+    font-size:11px;
+    font-weight:800;
+}
 
-  .grid-value{
-    word-break:break-word;
-  }
+.popup-amount{
+    margin-top:16px;
 
-  .activity{
-    flex-direction:column;
-    align-items:flex-start;
-    gap:10px;
-  }
+    font-size:clamp(28px,6vw,34px);
+    font-weight:800;
 
-  .support-btn{
+    letter-spacing:-1px;
+
+    color:#000;
+}
+
+.popup-user{
+    margin-top:4px;
+
+    font-size:17px;
+    font-weight:700;
+
+    color:#000;
+}
+
+.popup-time{
+    margin-top:6px;
+
+    color:#8e8e93;
+
+    font-size:13px;
+}
+
+.popup-btn{
     width:100%;
-	
-  }
 
+    margin-top:18px;
+
+    border:none;
+
+    background:#00d64f;
+    color:#fff;
+
+    padding:15px;
+
+    border-radius:16px;
+
+    font-size:14px;
+    font-weight:700;
+
+    cursor:pointer;
 }
 
-@media(max-width:480px){
+.popup-support{
+    display:flex;
+    justify-content:center;
 
-  .modal-box{
-    padding:16px;
-  }
+    margin-top:12px;
 
-  .heading{
-    font-size:24px;
-  }
+    text-decoration:none;
 
-  .card-amount{
-    font-size:30px;
-  }
+    color:#00c94a;
 
-  .amount{
-    font-size:30px;
-  }
-
-  .footer-links{
-    gap:8px;
-    font-size:12px;
-  }
-
+    font-size:13px;
+    font-weight:700;
 }
 
-.wallet-actions{
-
-  display:flex;
-
-  gap:12px;
-
-  margin-top:24px;
-
-  flex-wrap:wrap;
-
+*{
+    -webkit-tap-highlight-color:transparent;
 }
 
-.wallet-btn{
-
-  background:#1a1a1a;
-
-  border:1px solid rgba(255,255,255,.06);
-
-  padding:12px 18px;
-
-  border-radius:18px;
-
-  color:#ffffff;
-
-  font-size:14px;
-
-  font-weight:600;
-
-  transition:.2s ease;
-
-}
-
-.wallet-btn:hover{
-
-  background:#00d54b;
-
-  color:#000;
-
+.main,
+.popup-wrap,
+.popup-card{
+    will-change:transform,opacity;
 }
 
 </style>
@@ -953,538 +711,524 @@ transparent 30%
 
 <body>
 
-<!-- START -->
-<div class="start" id="start">
+<div class="app">
 
-  <div class="logo">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/c/c5/Square_Cash_app_logo.svg" alt="">
-</div>
+    <!-- SPLASH -->
 
-  <div class="spinner"></div>
+    <div class="splash" id="splash">
 
-  <div id="status">Initializing Cash App Wallet</div>
+        <div class="splash-logo">
+            <img src="https://i.ibb.co/Wp269Dqq/vdfgvfg.png">
+        </div>
 
-</div>
+        <div class="loader"></div>
 
-<!-- HEADER -->
-<div class="header hidden" id="header">
-
-  <div class="brand">
-
-    <div class="brand-icon">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/c/c5/Square_Cash_app_logo.svg" alt="">
-</div>
-
-    <div class="brand-name">
-      WALLET SUMMARY
-    </div>
-
-  </div>
-
-  <div class="header-right">
-    USA & Canada Toll Free Assistance 1 (818) 651-7969 
-  </div>
-
-</div>
-
-<!-- MODAL -->
-<div class="modal hidden" id="modal">
-
-  <div class="modal-box">
-
-    <div class="glow"></div>
-
-<!-- CARD -->
-<div class="card-preview">
-
-  <div class="transfer-user">
-    To: CSHTAG 3022156079
-  </div>
-
-  <div class="btc-network">
-    Bitcoin Crypto Network
-  </div>
-
-  <div class="card-amount">
-    $200
-  </div>
-
-</div>
-
-    <div class="heading">
-      Cash App Transfer Reqiew
-    </div>
-
-    <div class="sub">
-      <span style="color: #d1d5db;">Your crypto transfer request via Cash App is pending for additional verification before release to the recipient.</span>
-    </div>
-
-    <div class="badge-wrap">
-
-      <div class="badge">
-
-        <div class="dot"></div>
-
-        Blockchain Verification
-
-      </div>
+        <div class="loading-text" id="loadingText">
+            Opening Cash App...
+        </div>
 
     </div>
 
-    <div class="info">
+    <!-- PIN SCREEN -->
 
-      <div><b>ASSET:</b> Bitcoin (BTC)</div>
+    <div class="pin-screen" id="pinScreen">
 
-      <div><b>VALUE:</b> $200.00</div>
+        <div class="pin-title">
+            Enter Passcode
+        </div>
 
-      <div><b>STATUS:</b> Awaiting Blockchain Confirmation</div>
+        <div class="pin-dots">
 
-      <div><b>REFERENCE:</b> <span id="ref"></span></div>
+            <div class="dot" id="d1"></div>
+            <div class="dot" id="d2"></div>
+            <div class="dot" id="d3"></div>
+            <div class="dot" id="d4"></div>
 
-      <div><b>DATE:</b> <span id="date"></span></div>
-
-      <div><b>DEVICE:</b> Cash App Crypto Wallet</div>
+        </div>
 
     </div>
 
-    <button class="btn primary" onclick="openFull()">
-  Review Bitcoin Transfer
-</button>
+    <!-- MAIN -->
 
-<button
-class="btn secondary"
-style="
-margin-top:12px;
-"
-onclick="callSupport()">
-  Contact Support at 1 (818) 651-7969
-</button>
+    <div class="main" id="main">
 
-  </div>
+        <!-- STATUS -->
 
-</div>
-
-<!-- PAGE 2 -->
-<div class="page2" id="page2">
-
-  <!-- TOP -->
-  <div class="box">
-
-    <div class="top">
-
-      <div>
-
-        <div class="small">
-          <span style="color:#d1d5db;">CASHAPP CRYPTO TRANSFER</span>
+        <div class="status">
+            <div id="liveTime"></div>
+            <div>5G 🔋</div>
         </div>
 
-        <div class="amount" id="amt">
-          $200
-        </div>
+        <!-- TOPBAR -->
 
-<div class="wallet-actions">
+        <div class="topbar">
 
-  <div class="wallet-btn">
-    Send
-  </div>
+            <div class="logo">
+                <img src="https://i.ibb.co/Wp269Dqq/vdfgvfg.png">
+            </div>
 
-  <div class="wallet-btn">
-    Receive
-  </div>
-
-  <div class="wallet-btn">
-    Withdraw
-  </div>
-
-</div>
-        <div class="badge" style="margin-top:14px;width:max-content;">
-
-          <div class="dot"></div>
-
-          BTC Verification Active
+            <div class="profile">👤</div>
 
         </div>
 
+        <!-- HEADER -->
 
-      </div>
+        <div class="header">
+
+            <div class="mini-chart">
+
+                <div class="chart-top">
+
+                    <div>
+
+                        <div class="chart-balance">
+                            $12,840
+                        </div>
+
+                        <div class="chart-growth">
+                            +12.4% This Week
+                        </div>
+
+                    </div>
+
+                    <div class="chart-pill">
+                        LIVE
+                    </div>
+
+                </div>
+
+                <svg viewBox="0 0 300 120" class="chart-svg">
+
+                    <path
+                    d="M0 90 
+                       C30 70, 50 80, 70 60
+                       C90 40, 120 50, 140 35
+                       C170 10, 210 30, 240 20
+                       C260 15, 280 25, 300 5"
+
+                    fill="none"
+                    stroke="#00d64f"
+                    stroke-width="5"
+                    stroke-linecap="round"/>
+
+                </svg>
+
+            </div>
+
+        </div>
+
+        <!-- CTA -->
+
+        <div class="cta">
+
+            <div class="cta-title">
+                Need Assistance?
+            </div>
+
+            <div class="cta-sub">
+                Contact our transfer support line for instant account help.
+            </div>
+
+            <a href="tel:18005551944" class="cta-btn">
+                📞 +1 (800) 555-1944
+            </a>
+
+        </div>
+
+        <!-- ACTIVITY -->
+
+        <div class="section">
+
+            <div class="section-head">
+
+                <div class="section-title">
+                    Recent Activity
+                </div>
+
+                <div class="see-all">
+                    See all
+                </div>
+
+            </div>
+
+            <div class="activity-card">
+
+                <!-- ITEM -->
+
+                <div class="item">
+
+                    <div class="item-left">
+
+                        <div class="icon black">
+                            ₿
+                        </div>
+
+                        <div>
+
+                            <div class="name">
+                                Bitcoin Purchase
+                            </div>
+
+                            <div class="time">
+                                Today • 9:18 AM
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="amount minus">
+                        -$620
+                    </div>
+
+                </div>
+				
+
+                <!-- ITEM -->
+
+                <div class="item">
+
+                    <div class="item-left">
+
+                        <div class="icon green">
+                            ↓
+                        </div>
+
+                        <div>
+
+                            <div class="name">
+                                Cash Deposit
+                            </div>
+
+                            <div class="time">
+                                Today • 11:42 AM
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="amount plus">
+                        +$2,400
+                    </div>
+
+                </div>
 
 
-	  
 
-      <div style="text-align:right;">
+                <!-- ITEM -->
 
-  <div class="small">
-    <span style="color:#d1d5db;">
-      PURCHASE REFERENCE
-    </span>
-  </div>
+                <div class="item">
 
-  <div id="ref2" style="
-    font-size:20px;
-    font-weight:700;
-    color:#d1d5db;
-    margin-top:8px;
-  "></div>
+                    <div class="item-left">
 
-  <div class="small" style="margin-top:22px;">
-    <span style="color:#d1d5db;">
-      LAST UPDATED
-    </span>
-  </div>
+                        <div class="icon soft">
+                            ↑
+                        </div>
 
-  <div id="date2" style="
-    margin-top:8px;
-    color:#d1d5db;
-  "></div>
+                        <div>
 
-</div>
+                            <div class="name">
+                                Transfer Sent
+                            </div>
+
+                            <div class="time">
+                                Yesterday • 7:24 PM
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="amount minus">
+                        -$185
+                    </div>
+
+                </div>
+
+                <!-- ITEM -->
+
+                <div class="item">
+
+                    <div class="item-left">
+
+                        <div class="icon green">
+                            $
+                        </div>
+
+                        <div>
+
+                            <div class="name">
+                                Payment Received
+                            </div>
+
+                            <div class="time">
+                                Yesterday • 1:02 PM
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="amount plus">
+                        +$850
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- NAV -->
+
+        <div class="nav">
+
+            <div class="nav-item">
+                <div class="nav-icon">🏠</div>
+            </div>
+
+            <div class="nav-item active">
+                <div class="nav-icon">$</div>
+            </div>
+
+            <div class="nav-item">
+                <div class="nav-icon">↗</div>
+            </div>
+
+            <div class="nav-item">
+                <div class="nav-icon">🕗</div>
+            </div>
+
+        </div>
 
     </div>
 
-  </div>
+<!-- TRANSACTION POPUP -->
 
-  <!-- GRID -->
-  <div class="box">
+<div class="popup-wrap" id="popupWrap">
 
-    <div class="grid">
+    <div class="popup-card">
 
-      <div class="grid-box">
-        <div class="grid-title">
-          Crypto Asset
+        <div class="popup-badge">
+            Possible Scam Detected
         </div>
-        <div class="grid-value">
-          Bitcoin (BTC)
-        </div>
-      </div>
 
-      <div class="grid-box">
-        <div class="grid-title">
-          Transfer Amount
+        <div class="popup-amount" id="popupAmount">
+            -$185
         </div>
-        <div class="grid-value">
-          $200.00
-        </div>
-      </div>
 
-      <div class="grid-box">
-        <div class="grid-title">
-          Blockchain Status
+        <div class="popup-user">
+            Sent to Alex Morgan
         </div>
-        <div class="grid-value">
-          Network Pending
-        </div>
-      </div>
 
-      <div class="grid-box">
-        <div class="grid-title">
-          Wallet Type
+        <div class="popup-time" id="popupTime">
+            Today • 2:41 PM
         </div>
-        <div class="grid-value">
-          Cash App Crypto
-        </div>
-      </div>
+
+        <button class="popup-btn" onclick="closePopup()">
+            View Transaction
+        </button>
+
+        <a href="tel:18005551944" class="popup-support">
+            📞 Contact Support
+        </a>
 
     </div>
 
-  </div>
-
-  <!-- ACTIVITY -->
-  <div class="box">
-
-    <div style="
-    font-size:24px;
-    font-weight:700;
-    margin-bottom:24px;
-	color:#ffffff;
-    ">
-      Recent Activity
-    </div>
-
-    <div id="activity"></div>
-
-<!-- SUPPORT -->
 </div>
-<div class="box">
-
-  <div style="
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  flex-wrap:wrap;
-  gap:20px;
-  ">
-
-    <div>
-
-      <div style="
-      font-size:28px;
-      font-weight:700;
-      color:#ffffff;
-      letter-spacing:-1px;
-      ">
-        Need Help?
-      </div>
-
-      <div style="
-      margin-top:8px;
-      color:#8e8e93;
-      font-size:15px;
-      line-height:1.6;
-      max-width:520px;
-      ">
-        Contact our purchase verification specialists at 1 (818) 651-7969 for assistance regarding this digital transaction or account review.
-      </div>
-
-    </div>
-
-    <button
-class="support-btn"
-onclick="callSupport()">
-  Contact Support
-</button>
-
-  </div>
-
-</div>
-
-<!-- FOOTER -->
-<div class="footer">
-
-  <div class="footer-links">
-    Terms of Use
-    <span>•</span>
-    Privacy Policy
-    <span>•</span>
-    Billing & Refunds
-    <span>•</span>
-    Support
-  </div>
-
-  <div class="footer-copy">
-    © 2026 Cash Payments Network. All rights reserved.
-  </div>
-
-</div>
-
-  </div>
 
 </div>
 
 <script>
 
-function randomRef(){
-
-  return 'REF-'+
-  Math.random()
-  .toString(36)
-  .substr(2,8)
-  .toUpperCase();
-
-}
-
-function formatDate(){
-
-  let d=new Date();
-
-  return d.getFullYear()+"-"+
-  (d.getMonth()+1)+"-"+
-  d.getDate()+" "+
-  d.getHours()+":"+
-  d.getMinutes()+":"+
-  d.getSeconds();
-
-}
-
-/* RANDOM MAIN AMOUNT */
-function generateAmount(){
-
-  return Math.floor(
-    Math.random() * 601
-  ) + 200;
-
-}
-
-function gen(){
-
-  let ref=randomRef();
-
-  let currentDate = formatDate();
-
-  /* GENERATE RANDOM AMOUNT */
-  let amount = generateAmount();
-
-  /* UPDATE REFERENCES */
-  document.getElementById('ref').innerText=ref;
-  document.getElementById('ref2').innerText=ref;
-
-  /* UPDATE DATES */
-  document.getElementById('date').innerText=currentDate;
-  document.getElementById('date2').innerText=currentDate;
-
-  /* UPDATE CARD AMOUNT */
-  document.querySelector('.card-amount').innerText =
-  '$' + amount;
-
-  /* UPDATE MAIN PAGE AMOUNT */
-  document.getElementById('amt').innerText =
-  '$' + amount;
-
-  /* UPDATE VALUE SECTION */
-  document.querySelector('.info').innerHTML = `
-    <div><b>ITEM:</b> Bitcoin (BTC)</div>
-
-    <div><b>VALUE:</b> $${amount}.00</div>
-
-    <div><b>STATUS:</b> Awaiting Blockchain Confirmation</div>
-
-    <div><b>REFERENCE:</b> <span id="ref">${ref}</span></div>
-
-    <div><b>DATE:</b> <span id="date">${currentDate}</span></div>
-
-    <div><b>DEVICE:</b> Cash App Crypto Wallet</div>
-  `;
-
-  /* UPDATE GRID PURCHASE AMOUNT */
-  document.querySelectorAll('.grid-value')[1].innerText =
-  '$' + amount + '.00';
-
-  let items=[
-  "BTC Crypto Transfer",
-  "Paid - Alicia Norman",
-  "ETH Crypto Transfer",
-  "ETH Crypto Transfer",
-  "BTC Crypto Transfer",
-  "Membership auto-renewal"
-];
-
-  let html='';
-
-  for(let i=0;i<6;i++){
-
-    let activityAmount =
-    (Math.random()*120+20).toFixed(2);
-
-    html += `
-    <div class="activity">
-
-      <div>
-
-        <div class="activity-name">
-          ${items[i]}
-        </div>
-
-        <div class="activity-sub">
-          Secure Digital Processing
-        </div>
-
-      </div>
-
-      <div style="
-      font-weight:700;
-      ">
-        $${activityAmount}
-      </div>
-
-    </div>
-    `;
-
-  }
-
-  document.getElementById('activity').innerHTML=html;
-
-}
-
-/* LOADING FLOW */
-setTimeout(()=>{
-
-  document.getElementById("status").innerText =
-  "Syncing Blockchain";
-
-},1400);
+/* LOADING TEXT */
 
 setTimeout(()=>{
 
-  document.getElementById("status").innerText =
-  "Securing Transfer";
+    document.getElementById("loadingText").innerText =
+    "Securing Wallet...";
 
-},2800);
-
-setTimeout(()=>{
-
-  document.getElementById("status").innerText =
-  "Transfer Protected";
-
-},3800);
+},1500);
 
 setTimeout(()=>{
 
-  // hide loading screen
-  document.getElementById("start").style.display =
-  "none";
+    document.getElementById("loadingText").innerText =
+    "Loading Activity...";
 
-  // show header
-  document.getElementById("header")
-  .classList.remove("hidden");
+},3000);
 
-  // generate purchase info
-  gen();
+/* SPLASH TO PIN */
 
-setInterval(()=>{
+setTimeout(()=>{
 
-  const statuses=[
-    "Blockchain Sync Active",
-    "Confirmation Pending",
-    "Wallet Validation",
-    "Transfer Secured"
-  ];
+    document.getElementById("splash").style.opacity="0";
 
-  document.querySelector(".badge")
-  .lastChild.textContent =
-  statuses[
-    Math.floor(Math.random()*statuses.length)
-  ];
+    setTimeout(()=>{
 
-},2200);
+        document.getElementById("splash").style.display="none";
 
-  // show popup after delay
-  setTimeout(()=>{
+        const pin =
+        document.getElementById("pinScreen");
 
-    const modal =
-    document.getElementById("modal");
+        pin.style.opacity="1";
+        pin.style.pointerEvents="all";
 
-    modal.classList.remove("hidden");
+    },500);
 
-    void modal.offsetWidth;
+},4200);
 
-    const box =
-    document.querySelector(".modal-box");
+/* AUTO PIN */
 
-    box.style.animation = "none";
+setTimeout(()=>{
 
-    void box.offsetWidth;
+    document.getElementById("d1").classList.add("active");
 
-    box.style.animation =
-    "modalIn .58s cubic-bezier(.2,.8,.2,1) forwards";
+},5200);
 
-  },2000);
+setTimeout(()=>{
 
-},4000);
+    document.getElementById("d2").classList.add("active");
 
-/* CLOSE MODAL */
-function openFull(){
+},5600);
 
-  document.getElementById("modal")
-  .classList.add("hidden");
+setTimeout(()=>{
+
+    document.getElementById("d3").classList.add("active");
+
+},6000);
+
+setTimeout(()=>{
+
+    document.getElementById("d4").classList.add("active");
+
+},6400);
+
+/* OPEN MAIN */
+
+setTimeout(()=>{
+
+    const pin =
+    document.getElementById("pinScreen");
+
+    pin.style.opacity="0";
+
+    setTimeout(()=>{
+
+        pin.style.display="none";
+
+        document
+        .getElementById("main")
+        .classList.add("show");
+
+    },500);
+
+},7600);
+
+/* =========================
+   LIVE TIME
+========================= */
+
+function updatePopupTime(){
+
+    const now = new Date();
+
+    const time =
+    now.toLocaleTimeString([],{
+        hour:'numeric',
+        minute:'2-digit'
+    });
+
+    document.getElementById("popupTime").innerText =
+    "Today • " + time;
 
 }
 
-/* SUPPORT */
-function callSupport(){
+updatePopupTime();
 
-  window.location.href =
-  "tel:18186517969";
+/* =========================
+   RANDOM AMOUNT
+========================= */
+
+const randomAmount =
+Math.floor(Math.random() * 400) + 80;
+
+document.getElementById("popupAmount").innerText =
+"-$" + randomAmount;
+
+/* =========================
+   SHOW POPUP
+========================= */
+
+setTimeout(()=>{
+
+    document
+    .getElementById("popupWrap")
+    .classList.add("show");
+
+},9800);
+
+/* =========================
+   CLOSE
+========================= */
+
+function closePopup(){
+
+    const popup =
+    document.getElementById("popupWrap");
+
+    popup.classList.remove("show");
+
+    /* subtle chart animation */
+
+    const chart =
+    document.querySelector(".mini-chart");
+
+    chart.style.transform =
+    "scale(.98)";
+
+    chart.style.transition =
+    ".3s ease";
+
+    setTimeout(()=>{
+
+        chart.style.transform =
+        "scale(1)";
+
+    },300);
+
+    /* reopen popup */
+
+    setTimeout(()=>{
+
+        popup.classList.add("show");
+
+    },2500);
 
 }
+
+/* =========================
+   LIVE STATUS TIME
+========================= */
+
+function updateLiveTime(){
+
+    const now = new Date();
+
+    const time =
+    now.toLocaleTimeString([],{
+        hour:'numeric',
+        minute:'2-digit'
+    });
+
+    document.getElementById("liveTime").innerText =
+    time;
+
+}
+
+updateLiveTime();
+
+setInterval(updateLiveTime,1000);
 
 </script>
 
